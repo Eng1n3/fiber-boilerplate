@@ -27,4 +27,5 @@ go.work.sum
 # temporary build files
 /tmp
 
-
+# build directory
+/bin

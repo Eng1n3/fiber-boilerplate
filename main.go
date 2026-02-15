@@ -1,17 +1,18 @@
 package main
 
 import (
-    "log"
+	"fiber-boilerplate/app"
+	"fiber-boilerplate/database"
+	"log"
 
-    "github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v3"
+	"github.com/joho/godotenv"
 )
 
 func main() {
-    app := fiber.New()
+	godotenv.Load()
+	database.Connect()
 
-    app.Get("/", func (c *fiber.Ctx) error {
-        return c.SendString("Hello, World!")
-    })
-
-    log.Fatal(app.Listen(":9000"))
+	app := app.App()
+	log.Fatal(app.Listen(":8080", fiber.ListenConfig{EnablePrefork: true}))
 }

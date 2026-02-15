@@ -4,7 +4,7 @@
 
 > [!NOTE]
 > Make sure you have `golang-migrate` installed.\
-> See 👉 [How to install golang-migrate](https://github.com/golang-migrate/migrate)
+> See 👉 [How to install golang-migrate](https://github.com/golang-migrate/migrate/tree/master/cmd/migrate)
 
 ### Create Migration
 

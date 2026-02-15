@@ -1,15 +1,39 @@
 services:
-  postgres:
+  postgres-fiber-boilerplate:
     container_name: postgres-fiber-boilerplate
     ports:
       - 5432:5432
     image: postgres
     environment:
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=mysecretpassword
-      - POSTGRES_DB=fiber_boilerplate
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_NAME}
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
+      test: ["CMD", "pg_isready", "-U", "${DB_USER}"]
+      timeout: 1s
+      retries: 1
+    networks:
+      - fiber-boilerplate-network 
+  fiber-boilerplate:
+    build: .
+    image: fiber-boilerplate
+    container_name: fiber-boilerplate
+    ports:
+      - ${APP_PORT}:8083
+    depends_on:
+      postgres-fiber-boilerplate:
+        condition: service_healthy
+    # volumes:
+    #   - .:/usr/app
+    restart: on-failure
+    env_file:
+      - .env
+    networks:
+      - fiber-boilerplate-network
+
+# volumes:
+#   dbdata:
+
+networks:
+  fiber-boilerplate-network:
+    driver: bridge

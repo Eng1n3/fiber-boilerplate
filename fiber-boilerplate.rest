@@ -1,8 +1,8 @@
 ###
-POST http://127.0.0.1:8080/auth/login
+POST http://127.0.0.1:8083/auth/login
 
 ###
-POST http://127.0.0.1:8080/user
+POST http://127.0.0.1:8083/user
 
 ###
-GET http://127.0.0.1:8080/user
+GET http://127.0.0.1:8083/user

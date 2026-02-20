@@ -13,7 +13,9 @@ RUN go mod download
 
 # Builds the application as a staticly linked one, to allow it to run on alpine
 # RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o app .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o app .
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app app.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o seeder ./seeder
+
 
 # Moving the binary to the 'final Image' to make it smaller
 FROM alpine:latest AS release
@@ -26,14 +28,16 @@ COPY ./static ./static
 
 # `fiber_boilerplate` should be replaced here as well
 COPY --from=build /go/src/fiber_boilerplate/app .
+COPY --from=build /go/src/fiber_boilerplate/seeder .
 
 # `fiber_boilerplate` should be replaced here as well
-COPY --from=build /go/src/fiber_boilerplate/app .
+# COPY --from=build /go/src/fiber_boilerplate/database/seeder/main ./seeder
 
 # Add packages
 RUN apk -U upgrade \
 && apk add --no-cache ca-certificates \
-&& chmod +x /app/app
+&& chmod +x /app/app \
+&& chmod +x /app/seeder
 
 # Add migrate tool to run the migrations in the entrypoint
 RUN apk add --no-cache curl \

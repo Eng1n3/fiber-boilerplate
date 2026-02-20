@@ -28,4 +28,4 @@ go.work.sum
 /tmp
 
 # build directory
-/bin
+/cmd

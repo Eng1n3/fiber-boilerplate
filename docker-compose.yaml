@@ -10,8 +10,8 @@ services:
       - POSTGRES_DB=${DB_NAME}
     healthcheck:
       test: ["CMD", "pg_isready", "-U", "${DB_USER}"]
-      timeout: 1s
-      retries: 1
+      timeout: 5s
+      retries: 5
     networks:
       - fiber-boilerplate-network 
   fiber-boilerplate:

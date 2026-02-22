@@ -4,34 +4,40 @@ import (
 	"fiber-boilerplate/pkg/entities"
 
 	"github.com/gofiber/fiber/v3"
-	"gorm.io/gorm"
 )
 
-type UserService interface {
+type Service interface {
 	GetUsers(c fiber.Ctx) ([]entities.User, error)
+	GetUserByEmail(c fiber.Ctx, email string) (*entities.User, error)
 	// Define other user-related methods here
 }
 
-type userService struct {
-	DB *gorm.DB
+type service struct {
+	repository Repository
 }
 
-func NewService(db *gorm.DB) UserService {
-	// Return a concrete implementation of UserService
+func NewService(userRepo Repository) Service {
+	// Return a concrete implementation of Service
 	// This is a simplified example; in a real app, this would be more complex
-	return &userService{
-		DB: db,
+	return &service{
+		repository: userRepo,
 	}
 }
 
-// Implement UserService methods here
-func (s *userService) GetUsers(c fiber.Ctx) ([]entities.User, error) {
-	var users []entities.User
+// Implement Service methods here
+func (s *service) GetUsers(c fiber.Ctx) ([]entities.User, error) {
 	// Implement logic to retrieve users from the database
-	query := s.DB.WithContext(c.Context()).Order("created_at asc")
-	result := query.Find(&users)
-	if result.Error != nil {
-		return nil, result.Error
+	result, err := s.repository.GetUsers(c)
+	if err != nil {
+		return nil, err
 	}
-	return users, nil
+	return result, nil
+}
+
+func (s *service) GetUserByEmail(c fiber.Ctx, email string) (*entities.User, error) {
+	result, err := s.repository.GetUserByEmail(c, email)
+	if err != nil {
+		return nil, err
+	}
+	return result, nil
 }

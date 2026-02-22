@@ -17,6 +17,7 @@ import (
 func App() *fiber.App {
 
 	db := database.Connect()
+	userRepo := user.NewRepository(db)
 
 	app := fiber.New()
 
@@ -26,8 +27,8 @@ func App() *fiber.App {
 	app.Use(helmet.New())
 
 	// app.Route("/auth", routes.AuthRouter).Name("auth")
-	authService := auth.NewService()
-	userService := user.NewService(db)
+	authService := auth.NewService(userRepo)
+	userService := user.NewService(userRepo)
 
 	routes.AuthRouter(app, authService)
 	routes.UserRouter(app, userService)

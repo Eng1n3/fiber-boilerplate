@@ -2,6 +2,7 @@ package main
 
 import (
 	"fiber-boilerplate/pkg/entities"
+	"fiber-boilerplate/pkg/enums"
 	"fmt"
 
 	gs "github.com/randree/gormseeder"
@@ -16,11 +17,14 @@ func init() {
 		Perform: func(db *gorm.DB) error {
 			roles := &[]entities.Role{
 				{
-					Name:        "user",
+					Name:        string(enums.User),
 					Description: "role user"},
 				{
-					Name:        "admin",
+					Name:        string(enums.Admin),
 					Description: "role admin"},
+				{
+					Name:        string(enums.SuperUser),
+					Description: "role superuser"},
 			}
 
 			fmt.Println("Inserting roles:", roles)

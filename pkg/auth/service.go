@@ -1,23 +1,46 @@
 package auth
 
-import "fmt"
+import (
+	"errors"
+	"fiber-boilerplate/api/presenter"
+	"fiber-boilerplate/pkg/entities"
+	"fiber-boilerplate/pkg/user"
 
-type AuthService interface {
-	Login(username, password string) (string, error)
+	"github.com/gofiber/fiber/v3"
+	"golang.org/x/crypto/bcrypt"
+)
+
+type Service interface {
+	Login(c fiber.Ctx, u entities.User) (presenter.Tokens, error)
 }
 
-func NewService() AuthService {
-	// Return a concrete implementation of AuthService
+type service struct {
+	userRepo user.Repository
+}
+
+func NewService(userRepo user.Repository) Service {
+	// Return a concrete implementation of Service
 	// This is a simplified example; in a real app, this would be more complex
-	return &authService{}
+	return &service{
+		userRepo: userRepo,
+	}
 }
 
-type authService struct{}
-
-func (s *authService) Login(username, password string) (string, error) {
+func (s *service) Login(c fiber.Ctx, u entities.User) (presenter.Tokens, error) {
 	// Simplified login logic for demonstration
-	if username == "admin" && password == "password" {
-		return "fake-jwt-token", nil
+	user, err := s.userRepo.GetUserByEmail(c, u.Email)
+	if err != nil {
+		return presenter.Tokens{}, err
 	}
-	return "", fmt.Errorf("invalid credentials")
+
+	// In a real application, you would verify the password here
+	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(u.Password)) != nil {
+		return presenter.Tokens{}, errors.New("invalid credentials")
+	}
+	// Generate tokens (this is just a placeholder, implement your token generation logic)
+	tokens := presenter.Tokens{
+		AccessToken:  "access_token_placeholder",
+		RefreshToken: "refresh_token_placeholder",
+	}
+	return tokens, nil
 }

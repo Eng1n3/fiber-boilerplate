@@ -6,7 +6,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-func GetUsers(service user.UserService) fiber.Handler {
+func GetUsers(service user.Service) fiber.Handler {
 	return func(c fiber.Ctx) error {
 		users, err := service.GetUsers(c)
 		if err != nil {

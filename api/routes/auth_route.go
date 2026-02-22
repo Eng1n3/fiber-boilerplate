@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-func AuthRouter(app *fiber.App, service auth.AuthService) {
+func AuthRouter(app *fiber.App, service auth.Service) {
 	router := app.Group("/auth").Name("auth.")
 	router.Post("/login", handlers.LoginHandler(service)).Name("login")
 }

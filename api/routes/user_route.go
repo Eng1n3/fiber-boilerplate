@@ -7,7 +7,7 @@ import (
 	"github.com/gofiber/fiber/v3"
 )
 
-func UserRouter(app *fiber.App, service user.UserService) {
+func UserRouter(app *fiber.App, service user.Service) {
 	router := app.Group("/users")
 	router.Get("/", handlers.GetUsers(service)).Name("users")
 	router.Post("/", handlers.GetUsers(service)).Name("users")

@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE "role_groups_permissions" (
-    "role_id" TEXT NOT NULL,
-    "group_permission_id" TEXT NOT NULL,
+    "role_id" VARCHAR(255) NOT NULL,
+    "group_permission_id" VARCHAR(255) NOT NULL,
 
     CONSTRAINT "role_groups_permissions_pkey" PRIMARY KEY ("role_id")
 );

@@ -1,30 +1,38 @@
-package main
+package app
 
 import (
+	"fiber-boilerplate/api/handlers"
+	"fiber-boilerplate/api/routes"
 	"fiber-boilerplate/database"
-	"fiber-boilerplate/routes"
-	"fmt"
-	"log"
-	"os"
+	"fiber-boilerplate/middleware"
+	"fiber-boilerplate/pkg/auth"
+	"fiber-boilerplate/pkg/user"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/compress"
 	"github.com/gofiber/fiber/v3/middleware/cors"
 	"github.com/gofiber/fiber/v3/middleware/helmet"
-	"github.com/joho/godotenv"
 )
 
-func main() {
-	godotenv.Load()
-	database.Connect()
+func App() *fiber.App {
+
+	db := database.Connect()
 
 	app := fiber.New()
 
+	app.Use(middleware.RecoverConfig())
 	app.Use(cors.New())
 	app.Use(compress.New())
 	app.Use(helmet.New())
 
-	app.Route("/auth", routes.AuthRoute).Name("auth")
-	app.Route("/user", routes.UserRoute).Name("user")
-	log.Fatal(app.Listen(fmt.Sprintf(":%s", os.Getenv("APP_PORT"))))
+	// app.Route("/auth", routes.AuthRouter).Name("auth")
+	authService := auth.NewService()
+	userService := user.NewService(db)
+
+	routes.AuthRouter(app, authService)
+	routes.UserRouter(app, userService)
+
+	// 404 Handler
+	app.Use(handlers.NotFoundHandler())
+	return app
 }

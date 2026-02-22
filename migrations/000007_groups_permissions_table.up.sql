@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE "groups_permissions" (
-    "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
+    "id" VARCHAR(255) NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
     "description" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3),

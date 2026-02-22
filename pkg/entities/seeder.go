@@ -1,4 +1,4 @@
-package models
+package entities
 
 type Seeder struct {
 	Tag      string `gorm:"not null; uniqueIndex" json:"tag"`

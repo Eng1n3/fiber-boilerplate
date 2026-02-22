@@ -38,7 +38,7 @@ package main
 // 	return nil
 // }
 import (
-	"fiber-boilerplate/models"
+	"fiber-boilerplate/pkg/entities"
 	"fmt"
 	"os"
 
@@ -57,7 +57,7 @@ func init() {
 			if err != nil {
 				panic(err)
 			}
-			user := &models.User{
+			user := &entities.User{
 				Name:     "superuser",
 				Email:    os.Getenv("SUPERUSER_EMAIL"),
 				Password: string(password),
@@ -70,7 +70,7 @@ func init() {
 				return err
 			}
 
-			return err
+			return nil
 		},
 	})
 }

@@ -1,13 +1,13 @@
 -- CreateTable
 CREATE TABLE "permissions" (
-    "id" TEXT NOT NULL,
+    "id" VARCHAR(255) NOT NULL,
     "name" TEXT NOT NULL,
     "description" TEXT,
-    "endpoint" TEXT NOT NULL,
-    "method" TEXT NOT NULL,
+    "path" VARCHAR(255) NOT NULL,
+    "method" VARCHAR(255) NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3),
-    "deleted_at" TIMESTAMP(3),
+    "updated_at" TIMESTAMP(3) DEFAULT NULL,
+    "deleted_at" TIMESTAMP(3) DEFAULT NULL,
 
     CONSTRAINT "permissions_pkey" PRIMARY KEY ("id")
 );

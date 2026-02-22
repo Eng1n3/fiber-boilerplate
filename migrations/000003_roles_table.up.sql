@@ -1,11 +1,11 @@
 -- CreateTable
 CREATE TABLE "roles" (
-    "id" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
+    "id" VARCHAR(255) NOT NULL,
+    "name" VARCHAR(255) NOT NULL,
     "description" TEXT,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "updated_at" TIMESTAMP(3),
-    "deleted_at" TIMESTAMP(3),
+    "updated_at" TIMESTAMP(3) DEFAULT NULL,
+    "deleted_at" TIMESTAMP(3) DEFAULT NULL,
 
     CONSTRAINT "roles_pkey" PRIMARY KEY ("id")
 );

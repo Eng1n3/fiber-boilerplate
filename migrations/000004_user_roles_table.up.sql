@@ -1,7 +1,7 @@
 -- CreateTable
 CREATE TABLE "user_roles" (
-    "user_id" TEXT NOT NULL,
-    "role_id" TEXT NOT NULL,
+    "user_id" VARCHAR(255) NOT NULL,
+    "role_id" VARCHAR(255) NOT NULL,
 
     CONSTRAINT "user_roles_pkey" PRIMARY KEY ("user_id")
 );

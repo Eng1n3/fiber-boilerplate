@@ -6,6 +6,7 @@ import (
 	"fiber-boilerplate/database"
 	"fiber-boilerplate/middleware"
 	"fiber-boilerplate/pkg/auth"
+	"fiber-boilerplate/pkg/config"
 	"fiber-boilerplate/pkg/user"
 
 	"github.com/gofiber/fiber/v3"
@@ -19,7 +20,7 @@ func App() *fiber.App {
 	db := database.Connect()
 	userRepo := user.NewRepository(db)
 
-	app := fiber.New()
+	app := fiber.New(config.FiberConfig())
 
 	app.Use(middleware.RecoverConfig())
 	app.Use(cors.New())

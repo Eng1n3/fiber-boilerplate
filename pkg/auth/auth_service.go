@@ -1,17 +1,17 @@
 package auth
 
 import (
-	"errors"
 	"fiber-boilerplate/api/presenter"
-	"fiber-boilerplate/pkg/entities"
 	"fiber-boilerplate/pkg/user"
+	"fiber-boilerplate/pkg/validation"
+	"fmt"
 
 	"github.com/gofiber/fiber/v3"
 	"golang.org/x/crypto/bcrypt"
 )
 
 type Service interface {
-	Login(c fiber.Ctx, u entities.User) (presenter.Tokens, error)
+	Login(c fiber.Ctx, v *validation.Login) (presenter.Tokens, *fiber.Error)
 }
 
 type service struct {
@@ -26,16 +26,17 @@ func NewService(userRepo user.Repository) Service {
 	}
 }
 
-func (s *service) Login(c fiber.Ctx, u entities.User) (presenter.Tokens, error) {
+func (s *service) Login(c fiber.Ctx, v *validation.Login) (presenter.Tokens, *fiber.Error) {
 	// Simplified login logic for demonstration
-	user, err := s.userRepo.GetUserByEmail(c, u.Email)
+	fmt.Println(v.Email, 3311)
+	user, err := s.userRepo.GetUserByEmail(c, v.Email)
 	if err != nil {
-		return presenter.Tokens{}, err
+		return presenter.Tokens{}, fiber.NewError(fiber.StatusBadRequest, err.Error())
 	}
 
 	// In a real application, you would verify the password here
-	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(u.Password)) != nil {
-		return presenter.Tokens{}, errors.New("invalid credentials")
+	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(v.Password)) != nil {
+		return presenter.Tokens{}, fiber.NewError(fiber.StatusBadRequest, "Invalid username or password")
 	}
 	// Generate tokens (this is just a placeholder, implement your token generation logic)
 	tokens := presenter.Tokens{

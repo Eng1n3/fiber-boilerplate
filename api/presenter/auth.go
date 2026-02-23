@@ -27,7 +27,6 @@ func AuthFailureResponse(err error) fiber.Map {
 	return fiber.Map{
 		"status":  false,
 		"message": "Invalid credentials",
-		"data":    nil,
 		"meta": fiber.Map{
 			"trace_id":  nil,
 			"timestamp": time.Now().UTC().Format(time.RFC3339),

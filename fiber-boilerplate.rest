@@ -1,5 +1,11 @@
 ###
 POST http://127.0.0.1:8083/auth/login
+Content-Type: application/json
+
+{
+    "email": "superuser@example.com",
+    "password": "trijaojkk"
+}
 
 ###
 POST http://127.0.0.1:8083/users

@@ -1,8 +1,6 @@
 package presenter
 
 import (
-	"time"
-
 	"github.com/gofiber/fiber/v3"
 )
 
@@ -11,25 +9,29 @@ type Tokens struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
-func AuthSuccessResponse(tokens Tokens) fiber.Map {
+func AuthSuccessResponse(c fiber.Ctx, tokens Tokens) fiber.Map {
+	traceID := c.Locals("trace_id")
+	timestamp := c.Locals("timestamp")
 	return fiber.Map{
 		"status":  true,
 		"message": "Login successful!",
 		"data":    tokens,
 		"meta": fiber.Map{
-			"trace_id":  nil,
-			"timestamp": time.Now().UTC().Format(time.RFC3339),
+			"trace_id":  traceID,
+			"timestamp": timestamp,
 		},
 	}
 }
 
-func AuthFailureResponse(err error) fiber.Map {
+func AuthFailureResponse(c fiber.Ctx, err error, message string) fiber.Map {
+	traceID := c.Locals("trace_id")
+	timestamp := c.Locals("timestamp")
 	return fiber.Map{
 		"status":  false,
-		"message": "Invalid credentials",
+		"message": message,
 		"meta": fiber.Map{
-			"trace_id":  nil,
-			"timestamp": time.Now().UTC().Format(time.RFC3339),
+			"trace_id":  traceID,
+			"timestamp": timestamp,
 		},
 		"errors": err.Error(),
 	}

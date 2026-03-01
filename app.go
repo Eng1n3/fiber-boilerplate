@@ -8,6 +8,9 @@ import (
 	"fiber-boilerplate/pkg/auth"
 	"fiber-boilerplate/pkg/config"
 	"fiber-boilerplate/pkg/user"
+	"os"
+	"strconv"
+	"time"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/gofiber/fiber/v3/middleware/compress"
@@ -26,9 +29,17 @@ func App() *fiber.App {
 	app.Use(cors.New())
 	app.Use(compress.New())
 	app.Use(helmet.New())
+	app.Use(middleware.TraceMiddleware)
 
 	// app.Route("/auth", routes.AuthRouter).Name("auth")
-	authService := auth.NewService(userRepo)
+
+	jwtPrivateKey := os.Getenv("JWT_PRIVATE_KEY")
+	jwtRefreshPrivateKey := os.Getenv("JWT_REFRESH_PRIVATE_KEY")
+	jwtTTL, _ := strconv.Atoi(os.Getenv("JWT_TTL_IN_SECONDS"))
+	jwtTTLInSeconds := time.Duration(jwtTTL) * time.Second
+	jwtRefreshTTL, _ := strconv.Atoi(os.Getenv("JWT_REFRESH_TTL_IN_SECONDS"))
+	jwtRefreshTTLInSeconds := time.Duration(jwtRefreshTTL) * time.Second
+	authService := auth.NewService(userRepo, jwtPrivateKey, jwtRefreshPrivateKey, jwtTTLInSeconds, jwtRefreshTTLInSeconds)
 	userService := user.NewService(userRepo)
 
 	routes.AuthRouter(app, authService)

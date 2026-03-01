@@ -2,7 +2,7 @@
 CREATE TABLE "users" (
     "id" VARCHAR(255) NOT NULL,
     "email" VARCHAR(255) NOT NULL,
-    "name" VARCHAR(255),
+    "username" VARCHAR(255),
     "password" VARCHAR(255) NOT NULL,
     "is_verified" BOOLEAN NOT NULL DEFAULT FALSE,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

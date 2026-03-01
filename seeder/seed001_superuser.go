@@ -58,7 +58,7 @@ func init() {
 				panic(err)
 			}
 			user := &entities.User{
-				Name:     "superuser",
+				Username: "superuser",
 				Email:    os.Getenv("SUPERUSER_EMAIL"),
 				Password: string(password),
 			}

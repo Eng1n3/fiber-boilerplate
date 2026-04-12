@@ -15,13 +15,15 @@ import (
 )
 
 var (
-	ErrInvalidCredentials = errors.New("invalid credentials")
-	ErrInvalidToken       = errors.New("invalid token")
-	ErrExpiredToken       = errors.New("token has expired")
-	ErrEmailInUse         = errors.New("email already in use")
+	ErrInvalidUsernameOrPassword = errors.New("invalid username or password")
+	ErrInvalidCredentials        = errors.New("invalid credentials")
+	ErrInvalidToken              = errors.New("invalid token")
+	ErrExpiredToken              = errors.New("token has expired")
+	ErrEmailInUse                = errors.New("email already in use")
 )
 
 type Service interface {
+	Register(c fiber.Ctx, v *validation.Register) *fiber.Error
 	Login(c fiber.Ctx, v *validation.Login) (presenter.Tokens, *fiber.Error)
 }
 
@@ -43,6 +45,35 @@ func NewService(userRepo user.Repository, jwtPrivateKey string, jwtRefreshPrivat
 		jwtTTLInSeconds:        jwtTTLInSeconds,
 		jwtRefreshTTLInSeconds: jwtRefreshTTLInSeconds,
 	}
+}
+
+func (s *service) Register(c fiber.Ctx, v *validation.Register) *fiber.Error {
+	// Check if email is already in use
+	existingUser, err := s.userRepo.GetUserByEmail(c, v.Email)
+	if err == nil && existingUser != nil {
+		return fiber.NewError(fiber.StatusBadRequest, ErrEmailInUse.Error())
+	}
+
+	// Hash the password
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(v.Password), bcrypt.DefaultCost)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to hash password")
+	}
+
+	// Create a new user entity
+	user := &entities.User{
+		Username: v.Username,
+		Email:    v.Email,
+		Password: string(hashedPassword),
+	}
+
+	// Save the user to the database
+	err = s.userRepo.CreateUser(c, user)
+	if err != nil {
+		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create user")
+	}
+
+	return nil
 }
 
 // generateAccessToken creates a new JWT access token
@@ -127,12 +158,12 @@ func (s *service) Login(c fiber.Ctx, v *validation.Login) (presenter.Tokens, *fi
 	// Simplified login logic for demonstration
 	user, err := s.userRepo.GetUserByEmail(c, v.Email)
 	if err != nil {
-		return presenter.Tokens{}, fiber.NewError(fiber.StatusBadRequest, err.Error())
+		return presenter.Tokens{}, fiber.NewError(fiber.StatusNotFound, err.Error())
 	}
 
 	// In a real application, you would verify the password here
 	if bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(v.Password)) != nil {
-		return presenter.Tokens{}, fiber.NewError(fiber.StatusBadRequest, "Invalid username or password")
+		return presenter.Tokens{}, fiber.NewError(fiber.StatusBadRequest, ErrInvalidUsernameOrPassword.Error())
 	}
 
 	accessToken, err := s.generateAccessToken(user)

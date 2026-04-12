@@ -1,7 +1,9 @@
 package config
 
 import (
+	"errors"
 	"fiber-boilerplate/pkg/validation"
+	"fmt"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v3"
@@ -26,5 +28,27 @@ func (v *structValidator) Validate(out any) error {
 func FiberConfig() fiber.Config {
 	return fiber.Config{
 		StructValidator: &structValidator{validate: validator.New()},
+		// Override default error handler
+		ErrorHandler: func(ctx fiber.Ctx, err error) error {
+			// Status code defaults to 500
+			code := fiber.StatusInternalServerError
+
+			// Retrieve the custom status code if it's a *fiber.Error
+			var e *fiber.Error
+			if errors.As(err, &e) {
+				code = e.Code
+			}
+			fmt.Println(code, 41)
+
+			// Send custom error page
+			err = ctx.Status(code).SendFile(fmt.Sprintf("./%d.html", code))
+			if err != nil {
+				// In case the SendFile fails
+				return ctx.Status(fiber.StatusInternalServerError).SendString("Internal Server Error")
+			}
+
+			// Return from handler
+			return nil
+		},
 	}
 }

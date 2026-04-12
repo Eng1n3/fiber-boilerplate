@@ -2,7 +2,7 @@ include .env
 export $(shell sed 's/=.*//' .env)
 
 start:
-	@go run app.go
+	@go run ./cmd/main.go
 lint:
 	@golangci-lint run
 tests:

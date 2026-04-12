@@ -9,7 +9,34 @@ type Tokens struct {
 	RefreshToken string `json:"refresh_token"`
 }
 
-func AuthSuccessResponse(c fiber.Ctx, tokens Tokens) fiber.Map {
+func AuthRegisterSuccessResponse(c fiber.Ctx) fiber.Map {
+	traceID := c.Locals("trace_id")
+	timestamp := c.Locals("timestamp")
+	return fiber.Map{
+		"status":  true,
+		"message": "Registration successful!",
+		"meta": fiber.Map{
+			"trace_id":  traceID,
+			"timestamp": timestamp,
+		},
+	}
+}
+
+func AuthRegisterFailureResponse(c fiber.Ctx, err interface{}, message string) fiber.Map {
+	traceID := c.Locals("trace_id")
+	timestamp := c.Locals("timestamp")
+	return fiber.Map{
+		"status":  false,
+		"message": message,
+		"meta": fiber.Map{
+			"trace_id":  traceID,
+			"timestamp": timestamp,
+		},
+		"errors": err,
+	}
+}
+
+func AuthLoginSuccessResponse(c fiber.Ctx, tokens Tokens) fiber.Map {
 	traceID := c.Locals("trace_id")
 	timestamp := c.Locals("timestamp")
 	return fiber.Map{
@@ -23,7 +50,7 @@ func AuthSuccessResponse(c fiber.Ctx, tokens Tokens) fiber.Map {
 	}
 }
 
-func AuthFailureResponse(c fiber.Ctx, err error, message string) fiber.Map {
+func AuthLoginFailureResponse(c fiber.Ctx, err interface{}, message string) fiber.Map {
 	traceID := c.Locals("trace_id")
 	timestamp := c.Locals("timestamp")
 	return fiber.Map{
@@ -33,6 +60,6 @@ func AuthFailureResponse(c fiber.Ctx, err error, message string) fiber.Map {
 			"trace_id":  traceID,
 			"timestamp": timestamp,
 		},
-		"errors": err.Error(),
+		"errors": err,
 	}
 }

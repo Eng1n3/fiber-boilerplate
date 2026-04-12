@@ -27,17 +27,9 @@ func NewService(userRepo Repository) Service {
 // Implement Service methods here
 func (s *service) GetUsers(c fiber.Ctx) ([]entities.User, error) {
 	// Implement logic to retrieve users from the database
-	result, err := s.repository.GetUsers(c)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+	return s.repository.GetUsers(c)
 }
 
 func (s *service) GetUserByEmail(c fiber.Ctx, email string) (*entities.User, error) {
-	result, err := s.repository.GetUserByEmail(c, email)
-	if err != nil {
-		return nil, err
-	}
-	return result, nil
+	return s.repository.GetUserByEmail(c, email)
 }

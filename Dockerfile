@@ -13,7 +13,7 @@ RUN go mod download
 
 # Builds the application as a staticly linked one, to allow it to run on alpine
 # RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o app .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app app.go
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app cmd/main.go
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o seeder ./seeder
 
 
@@ -44,7 +44,7 @@ RUN apk add --no-cache curl \
     && curl -L https://github.com/golang-migrate/migrate/releases/latest/download/migrate.linux-amd64.tar.gz \
     | tar xvz \
     && mv migrate /usr/local/bin/migrate
-# Exposes port 8080 because our program listens on that port
-EXPOSE 8080
+# Exposes port 8084 because our program listens on that port
+EXPOSE 8084
 
 CMD ["./app"]

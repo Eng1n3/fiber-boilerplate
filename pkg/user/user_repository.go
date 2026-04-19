@@ -13,9 +13,9 @@ var (
 )
 
 type Repository interface {
-	CreateUser(c fiber.Ctx, user *entities.User) *fiber.Error
-	GetUsers(c fiber.Ctx) ([]entities.User, *fiber.Error)
-	GetUserByEmail(c fiber.Ctx, email string) (*entities.User, *fiber.Error)
+	CreateUser(c fiber.Ctx, user *entities.User) error
+	GetUsers(c fiber.Ctx) ([]entities.User, error)
+	GetUserByEmail(c fiber.Ctx, email string) (*entities.User, error)
 	// Define other user-related methods here
 }
 
@@ -31,31 +31,28 @@ func NewRepository(db *gorm.DB) Repository {
 	}
 }
 
-func (s *userRepository) CreateUser(c fiber.Ctx, user *entities.User) *fiber.Error {
+func (s *userRepository) CreateUser(c fiber.Ctx, user *entities.User) error {
 	result := s.DB.WithContext(c.Context()).Create(user)
 	if result.Error != nil {
-		return fiber.NewError(fiber.StatusInternalServerError, "Failed to create user")
+		return result.Error
 	}
 	return nil
 }
 
-func (s *userRepository) GetUsers(c fiber.Ctx) ([]entities.User, *fiber.Error) {
+func (s *userRepository) GetUsers(c fiber.Ctx) ([]entities.User, error) {
 	var users []entities.User
 	result := s.DB.WithContext(c.Context()).Find(&users)
 	if result.Error != nil {
-		panic(result.Error.Error())
+		return nil, result.Error
 	}
 	return users, nil
 }
 
-func (s *userRepository) GetUserByEmail(c fiber.Ctx, email string) (*entities.User, *fiber.Error) {
+func (s *userRepository) GetUserByEmail(c fiber.Ctx, email string) (*entities.User, error) {
 	var user entities.User
 	result := s.DB.WithContext(c.Context()).Where("email = ?", email).First(&user)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, fiber.NewError(fiber.StatusNotFound, "User not found!")
-	}
 	if result.Error != nil {
-		panic(result.Error.Error())
+		return nil, result.Error
 	}
 	return &user, nil
 }

@@ -3,6 +3,8 @@ export $(shell sed 's/=.*//' .env)
 
 start:
 	@go run ./cmd/main.go
+start-dev:
+	@go tool air -c .air.toml
 lint:
 	@golangci-lint run
 tests:

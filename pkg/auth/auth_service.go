@@ -6,12 +6,15 @@ import (
 	"fiber-boilerplate/pkg/entities"
 	"fiber-boilerplate/pkg/user"
 	"fiber-boilerplate/pkg/validation"
-	"strconv"
+	"fiber-boilerplate/utils"
 	"time"
+
+	"github.com/sirupsen/logrus"
 
 	"github.com/gofiber/fiber/v3"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/gorm"
 )
 
 var (
@@ -28,6 +31,7 @@ type Service interface {
 }
 
 type service struct {
+	log                    *logrus.Logger
 	userRepo               user.Repository
 	jwtPrivateKey          []byte
 	jwtRefreshPrivateKey   []byte
@@ -39,6 +43,7 @@ func NewService(userRepo user.Repository, jwtPrivateKey string, jwtRefreshPrivat
 	// Return a concrete implementation of Service
 	// This is a simplified example; in a real app, this would be more complex
 	return &service{
+		log:                    utils.Log,
 		userRepo:               userRepo,
 		jwtPrivateKey:          []byte(jwtPrivateKey),
 		jwtRefreshPrivateKey:   []byte(jwtRefreshPrivateKey),
@@ -51,12 +56,13 @@ func (s *service) Register(c fiber.Ctx, v *validation.Register) *fiber.Error {
 	// Check if email is already in use
 	existingUser, err := s.userRepo.GetUserByEmail(c, v.Email)
 	if err == nil && existingUser != nil {
+		s.log.Errorf("Registration attempt with already used email: %v", err)
 		return fiber.NewError(fiber.StatusBadRequest, ErrEmailInUse.Error())
 	}
 
 	// Hash the password
-	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(v.Password), bcrypt.DefaultCost)
-	if err != nil {
+	hashedPassword, hashErr := bcrypt.GenerateFromPassword([]byte(v.Password), bcrypt.DefaultCost)
+	if hashErr != nil {
 		return fiber.NewError(fiber.StatusInternalServerError, "Failed to hash password")
 	}
 
@@ -83,11 +89,11 @@ func (s *service) generateRefreshToken(user *entities.User) (string, error) {
 
 	// Create the JWT claims
 	claims := jwt.MapClaims{
-		"sub":      strconv.FormatUint(uint64(user.ID[bcrypt.DefaultCost]), 10), // subject (user ID)
-		"username": user.Username,                                               // custom claim
-		"email":    user.Email,                                                  // custom claim
-		"exp":      expirationTime.Unix(),                                       // expiration time
-		"iat":      time.Now().Unix(),                                           // issued at time
+		"sub":      user.ID.String(), // subject (user ID)
+		"username": user.Username,    // custom claim
+		"email":    user.Email,       // custom claim
+		"exp":      expirationTime.Unix(),
+		"iat":      time.Now().Unix(),
 	}
 
 	// Create the token with claims
@@ -109,11 +115,11 @@ func (s *service) generateAccessToken(user *entities.User) (string, error) {
 
 	// Create the JWT claims
 	claims := jwt.MapClaims{
-		"sub":      strconv.FormatUint(uint64(user.ID[bcrypt.DefaultCost]), 10), // subject (user ID)
-		"username": user.Username,                                               // custom claim
-		"email":    user.Email,                                                  // custom claim
-		"exp":      expirationTime.Unix(),                                       // expiration time
-		"iat":      time.Now().Unix(),                                           // issued at time
+		"sub":      user.ID.String(), // subject (user ID)
+		"username": user.Username,    // custom claim
+		"email":    user.Email,       // custom claim
+		"exp":      expirationTime.Unix(),
+		"iat":      time.Now().Unix(),
 	}
 
 	// Create the token with claims
@@ -157,8 +163,9 @@ func (s *service) ValidateToken(tokenString string) (jwt.MapClaims, error) {
 func (s *service) Login(c fiber.Ctx, v *validation.Login) (presenter.Tokens, *fiber.Error) {
 	// Simplified login logic for demonstration
 	user, err := s.userRepo.GetUserByEmail(c, v.Email)
-	if err != nil {
-		return presenter.Tokens{}, fiber.NewError(fiber.StatusNotFound, err.Error())
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		s.log.Errorf("Login attempt with non-existent email: %v", err)
+		return presenter.Tokens{}, fiber.NewError(fiber.StatusNotFound, "User not found")
 	}
 
 	// In a real application, you would verify the password here
@@ -166,8 +173,16 @@ func (s *service) Login(c fiber.Ctx, v *validation.Login) (presenter.Tokens, *fi
 		return presenter.Tokens{}, fiber.NewError(fiber.StatusBadRequest, ErrInvalidUsernameOrPassword.Error())
 	}
 
-	accessToken, err := s.generateAccessToken(user)
-	refreshToken, err := s.generateRefreshToken(user)
+	accessToken, accessErr := s.generateAccessToken(user)
+	if accessErr != nil {
+		return presenter.Tokens{}, fiber.NewError(fiber.StatusInternalServerError, accessErr.Error())
+	}
+
+	refreshToken, refreshErr := s.generateRefreshToken(user)
+	if refreshErr != nil {
+		return presenter.Tokens{}, fiber.NewError(fiber.StatusInternalServerError, refreshErr.Error())
+	}
+
 	// Generate tokens (this is just a placeholder, implement your token generation logic)
 	tokens := presenter.Tokens{
 		AccessToken:  accessToken,

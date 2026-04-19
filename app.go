@@ -25,11 +25,12 @@ func App() *fiber.App {
 
 	app := fiber.New(config.FiberConfig())
 
-	app.Use(middleware.RecoverConfig())
+	app.Use(middleware.LoggerConfig())
 	app.Use(cors.New())
 	app.Use(compress.New())
 	app.Use(helmet.New())
 	app.Use(middleware.TraceMiddleware)
+	app.Use(middleware.RecoverConfig())
 
 	// app.Route("/auth", routes.AuthRouter).Name("auth")
 

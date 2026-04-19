@@ -19,7 +19,7 @@ services:
     image: fiber-boilerplate
     container_name: fiber-boilerplate
     ports:
-      - ${APP_PORT}:8083
+      - ${APP_PORT}:8084
     depends_on:
       postgres-fiber-boilerplate:
         condition: service_healthy

@@ -4,11 +4,11 @@ Content-Type: application/json
 
 {
     "email": "superuser@exampl.com",
-    "password": "Tr0j4n_w4r3"
+    "password": "Sup3_us3r"
 }
 
 ###
 POST http://127.0.0.1:8083/users
 
 ###
-GET http://127.0.0.1:8083
+GET http://127.0.0.1:8084/users

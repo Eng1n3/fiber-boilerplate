@@ -38,7 +38,6 @@ func FiberConfig() fiber.Config {
 			if errors.As(err, &e) {
 				code = e.Code
 			}
-			fmt.Println(code, 41)
 
 			// Send custom error page
 			err = ctx.Status(code).SendFile(fmt.Sprintf("./%d.html", code))

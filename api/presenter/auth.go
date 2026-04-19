@@ -10,56 +10,44 @@ type Tokens struct {
 }
 
 func AuthRegisterSuccessResponse(c fiber.Ctx) fiber.Map {
-	traceID := c.Locals("trace_id")
 	timestamp := c.Locals("timestamp")
 	return fiber.Map{
-		"status":  true,
-		"message": "Registration successful!",
-		"meta": fiber.Map{
-			"trace_id":  traceID,
-			"timestamp": timestamp,
-		},
+		"status":    true,
+		"message":   "Registration successful!",
+		"meta":      nil,
+		"timestamp": timestamp,
 	}
 }
 
 func AuthRegisterFailureResponse(c fiber.Ctx, err interface{}, message string) fiber.Map {
-	traceID := c.Locals("trace_id")
 	timestamp := c.Locals("timestamp")
 	return fiber.Map{
-		"status":  false,
-		"message": message,
-		"meta": fiber.Map{
-			"trace_id":  traceID,
-			"timestamp": timestamp,
-		},
-		"errors": err,
+		"status":    false,
+		"message":   message,
+		"meta":      nil,
+		"timestamp": timestamp,
+		"errors":    err,
 	}
 }
 
 func AuthLoginSuccessResponse(c fiber.Ctx, tokens Tokens) fiber.Map {
-	traceID := c.Locals("trace_id")
 	timestamp := c.Locals("timestamp")
 	return fiber.Map{
-		"status":  true,
-		"message": "Login successful!",
-		"data":    tokens,
-		"meta": fiber.Map{
-			"trace_id":  traceID,
-			"timestamp": timestamp,
-		},
+		"status":    true,
+		"message":   "Login successful!",
+		"data":      tokens,
+		"meta":      nil,
+		"timestamp": timestamp,
 	}
 }
 
 func AuthLoginFailureResponse(c fiber.Ctx, err interface{}, message string) fiber.Map {
-	traceID := c.Locals("trace_id")
 	timestamp := c.Locals("timestamp")
 	return fiber.Map{
-		"status":  false,
-		"message": message,
-		"meta": fiber.Map{
-			"trace_id":  traceID,
-			"timestamp": timestamp,
-		},
-		"errors": err,
+		"status":    false,
+		"message":   message,
+		"meta":      nil,
+		"timestamp": timestamp,
+		"errors":    err,
 	}
 }
